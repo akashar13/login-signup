@@ -15,9 +15,12 @@
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
+const globalErrorHandler = require('./controllers/errorController');
+
 app.use(morgan('dev'))
 const userRouter = require('./routes/routes')
 app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use('/api/v1/user', userRouter);
 app.use((req, res, next) => {
     //allow access from every, elminate CORS
@@ -30,4 +33,5 @@ app.use((req, res, next) => {
     //allow request to continue and be handled by routes
     next();
 });
+app.use(globalErrorHandler);
 module.exports = app

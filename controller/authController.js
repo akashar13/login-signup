@@ -1,10 +1,11 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync')
 const User = require('./../modals/User');
 
 
-const signToken =id =>{
-    return  jwt.sign({
+const signToken = id => {
+    return jwt.sign({
         id
     }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN
@@ -25,20 +26,22 @@ exports.signup = catchAsync(async (req, res, next) => {
         token
     })
 })
-exports.login = catchAsync(async(req,res,next)=>{
+exports.login = catchAsync(async (req, res, next) => {
     console.log(req.body);
-    const {email,password} = req.body;
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return next(new AppError('Please provide email and password', 400))
+    }
 
+    const user = await User.findOne({ email }).select('+password')
 
-    const user =await User.findOne({email}).select('+password')
- 
-    if(!user || !await user.correctPassword(password,user.password)){
+    if (!user || !await user.correctPassword(password, user.password)) {
         return next(console.log("not"))
     }
 
-    const token =signToken(user._id)
+    const token = signToken(user._id)
     res.status(200).json({
-        status:"success",
+        status: "success",
         token
     })
 
