@@ -15,7 +15,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
-const globalErrorHandler = require('./controllers/errorController');
+const globalErrorHandler = require('./controller/errorController');
 
 app.use(morgan('dev'))
 const userRouter = require('./routes/routes')
