@@ -16,22 +16,24 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 const globalErrorHandler = require('./controller/errorController');
+const cors = require("cors"); //Add this
+
 
 app.use(morgan('dev'))
 const userRouter = require('./routes/routes')
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use('/api/v1/user', userRouter);
-app.use((req, res, next) => {
-    //allow access from every, elminate CORS
+app.use((res, req, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.removeHeader('x-powered-by');
-    //set the allowed HTTP methods to be requested
-    res.setHeader('Access-Control-Allow-Methods', 'POST');
-    //headers clients can use in their requests
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    //allow request to continue and be handled by routes
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    );
+    res.setHeader('Access-Control-Allow-Methods','GET, POST, PATCH, DELETE');
+
     next();
 });
+app.use(cors()); //And add this line as well
 app.use(globalErrorHandler);
 module.exports = app
